@@ -1,0 +1,82 @@
+{%extends 'shop/basic.html'%}
+{%block title%}
+<title>Checkout</title>
+{%endblock%}
+{%block body%}
+<div class="container">
+    <div class="col">
+        <h2 class="my-2">Step 1 : Review Your Cart Items</h2>
+        <div>
+            <ul class="list-group" id="items">
+            </ul>
+        </div>
+        <div class="container my-4">
+            <h2>Step 2 : Enter your Details</h2>
+            <form id="form" method="post" action="/shop/checkout">{%csrf_token%}
+                <input type="hidden" class="itemsJson" name="itemsJson" id="itemsJson">
+                <div class="mb-3">
+                    <label class="form-label" for="name" >Name</label>
+                    <input class="form-control" id="name" name="name" type="text">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="contact">Contact</label>
+                    <input class="form-control" id="contact" name="contact" type="text">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="address">Address</label>
+                    <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+                </div>
+                <button class="btn btn-success" id="placeorder" type="submit">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+{% endblock%}
+{%block js%}
+<script>
+if(localStorage.getItem('cartItems')==null){
+var cart={};
+}
+else{
+cart = JSON.parse(localStorage.getItem("cartItems"));
+updateCart();
+}
+function updateCart(){
+let total=0;
+for(var item in cart)
+total = total + cart[item][0];
+document.getElementById('cart').innerHTML = total;
+}
+if ($.isEmptyObject(cart)){
+mystr = "<h2>Your cart is empty, please add some items to your cart before checking out!<h2>"
+$('#items').append(mystr);
+}
+for(item in cart){
+let name = cart[item][1];
+let qty = cart[item][0];
+mystr = ` <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${name}
+                    <span class="badge bg-primary rounded-pill" style="color:white">${qty}</span>
+                </li>`
+$('#items').append(mystr);
+}
+
+$('#itemsJson').val(JSON.stringify(cart));
+placeorder = document.getElementById('placeorder')
+placeorder.addEventListener('click',(e)=>{
+<!--e.preventDefault();-->
+document.getElementById('alert').innerHTML=`<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Your order has been placed successfully!</strong> Thank you for shopping with us :)</div>`;
+setTimeout(function() {document.getElementById('alert').innerHTML='';},5000);
+localStorage.clear();
+<!--{%if thank%}-->
+<!--document.getElementById('form').reset();-->
+<!--{%endif%}-->
+
+})
+
+
+</script>
+{%endblock%}
